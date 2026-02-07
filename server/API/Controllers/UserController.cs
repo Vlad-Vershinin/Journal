@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Domain.DTOs;
+using Domain.Models;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,5 +21,11 @@ public class UserController : ControllerBase
     {
         await _userService.CreateUser(user);
         return Ok();
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    {
+        return await _userService.Login(dto) ? Ok() : BadRequest();
     }
 }
