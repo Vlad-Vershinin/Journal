@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Domain.Services;
 using Application.Services;
+using Infrastucture.Services;
 
 namespace API;
 
@@ -31,7 +32,9 @@ public class Program
         builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
 
-        builder.Services.AddScoped<IUserService, UserService>();  
+        builder.Services.AddScoped<IUserService, UserService>();
+
+        builder.Services.AddTransient<IPasswordService, PasswordService>();
 
         var app = builder.Build();
 
