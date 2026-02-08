@@ -27,6 +27,13 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        return await _userService.Login(dto) ? Ok() : BadRequest();
+        var result = await _userService.Login(dto);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.Messages);
+        }
+
+        return Ok();
     }
 }
