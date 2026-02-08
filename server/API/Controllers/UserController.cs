@@ -2,6 +2,7 @@
 using Domain.Models;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace API.Controllers;
 
