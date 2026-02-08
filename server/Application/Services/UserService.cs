@@ -18,19 +18,32 @@ public class UserService : IUserService
         _passwordService = passwordService;
     }
 
-    public async Task CreateUser(User user)
+    public async Task<Result<User>> CreateUser(User user)
     {
         user.PasswordHash = _passwordService.HashPassword(user.PasswordHash);
         await _repository.AddAsync(user);
+        await _repository.SaveChangesAsync();
+
+        var new_user = await _repository.GetByLoginAsync(user.Login);
+
+        if (new_user is null)
+        {
+            return Result<User>.Failure(ErrorCode.NotCreated, "Не удалось создать пользователя.");
+        }
+        
+        return Result<User>.Success(new_user);
     }
 
-    public async Task<bool> Login(LoginDto dto)
+    public async Task<Result> Login(LoginDto dto)
     {
         var user = await _repository.GetByLoginAsync(dto.Login);
 
         if (user is null)
-            return false;
+            return Result.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
 
-        return _passwordService.ValidatePassword(dto.Password, user.PasswordHash);
+        if (!_passwordService.ValidatePassword(dto.Password, user.PasswordHash))
+            return Result.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
+
+        return Result.Success();
     }
 }
