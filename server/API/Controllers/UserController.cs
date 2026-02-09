@@ -2,7 +2,6 @@
 using Domain.Models;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace API.Controllers;
 
@@ -20,8 +19,14 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] User user)
     {
-        await _userService.CreateUser(user);
-        return Ok();
+        var result = await _userService.CreateUser(user);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpPost("login")]
@@ -29,7 +34,7 @@ public class UserController : ControllerBase
     {
         var result = await _userService.Login(dto);
 
-        if (!result.IsSuccess)
+        if (result.IsFailure)
         {
             return BadRequest(result.Messages);
         }

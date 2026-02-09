@@ -3,6 +3,7 @@
 public class Result
 {
     public bool IsSuccess { get; }
+    public bool IsFailure { get => !IsSuccess; }
     public ErrorCode? ErrorCode { get; }
     public IReadOnlyList<string> Messages { get; }
 
