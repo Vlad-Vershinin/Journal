@@ -1,11 +1,12 @@
-using DotNetEnv;
+using Application.Services;
 using Domain.Repositories;
+using Domain.Services;
+using DotNetEnv;
 using Infrastucture.Repositories;
+using Infrastucture.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using Domain.Services;
-using Application.Services;
-using Infrastucture.Services;
+using Serilog;
 
 namespace API;
 
@@ -20,9 +21,21 @@ public class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
+
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        builder.Host.UseSerilog((context, services, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration));
+
+
         builder.Services.AddControllers();
+
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
+
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGroupRepository, GroupRepository>();
@@ -36,12 +49,27 @@ public class Program
 
         builder.Services.AddTransient<IPasswordService, PasswordService>();
 
+
         var app = builder.Build();
 
+        app.UseSerilogRequestLogging();
         app.UseCors("AllowAll");
-        app.MapControllers();
         app.UseRouting();
+        app.MapControllers();
+
+        app.Lifetime.ApplicationStarted.Register(() =>
+        {
+            using var scope = app.Services.CreateScope();
+            var dataSource = scope.ServiceProvider.GetRequiredService<EndpointDataSource>();
+            var endpoints = dataSource.Endpoints;
+
+            Log.Information("Сервер запущен. Адреса: {Urls}. Кол-во эндпоинтов: {EndpointCount}",
+                string.Join(", ", app.Urls),
+                endpoints.Count);
+        });
 
         app.Run();
+
+        Log.Information("Сервер остановлен.");
     }
 }
