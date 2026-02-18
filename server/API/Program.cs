@@ -2,6 +2,7 @@ using Application.Services;
 using Domain.Repositories;
 using Domain.Services;
 using DotNetEnv;
+using Infrastucture;
 using Infrastucture.Repositories;
 using Infrastucture.Services;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,8 @@ public class Program
         builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
 
         builder.Services.AddScoped<IUserService, UserService>();
+
+        builder.Services.AddInfrastucture(builder.Configuration);
 
         builder.Services.AddTransient<IPasswordService, PasswordService>();
 

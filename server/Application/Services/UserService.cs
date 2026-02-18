@@ -1,4 +1,5 @@
-﻿using Domain.DTOs;
+﻿using Application.Abstractions;
+using Domain.DTOs;
 using Domain.Models;
 using Domain.Repositories;
 using Domain.Services;
@@ -11,15 +12,18 @@ public class UserService : IUserService
     private readonly IUserRepository _repository;
     private readonly IPasswordService _passwordService;
     private readonly ILogger<UserService> _logger;
+    private readonly IJwtService _jwtService;
 
     public UserService(
         IUserRepository repository, 
         IPasswordService passwordService,
-        ILogger<UserService> logger)
+        ILogger<UserService> logger,
+        IJwtService jwtService)
     {
         _repository = repository;
         _passwordService = passwordService;
         _logger = logger;
+        _jwtService = jwtService;
     }
 
     public async Task<Result<User>> CreateUser(User user)
@@ -50,23 +54,25 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<Result> Login(LoginDto dto)
+    public async Task<Result<string>> Login(LoginDto dto)
     {
         var user = await _repository.GetByLoginAsync(dto.Login);
 
         if (user is null)
         {
             _logger.LogWarning("Попытка входа: пользователь {Login} не найден", dto.Login);
-            return Result.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
+            return Result<string>.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
         }
 
         if (!_passwordService.ValidatePassword(dto.Password, user.PasswordHash))
         {
             _logger.LogWarning("Попытка входа: неверный пароль для {Login}", dto.Login);
-            return Result.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
+            return Result<string>.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
         }
 
+        var jwtToken = _jwtService.GenerateJwt(user);
+
         _logger.LogInformation("Пользователь {Login} успешно авторизован.", user.Login);
-        return Result.Success();
+        return Result<string>.Success(jwtToken);
     }
 }
