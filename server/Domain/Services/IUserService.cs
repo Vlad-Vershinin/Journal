@@ -6,5 +6,5 @@ namespace Domain.Services;
 public interface IUserService
 {
     Task<Result<User>> CreateUser(User user);
-    Task<Result> Login(LoginDto dto);
+    Task<Result<string>> Login(LoginDto dto);
 }

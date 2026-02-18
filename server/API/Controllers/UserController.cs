@@ -39,6 +39,6 @@ public class UserController : ControllerBase
             return BadRequest(result.Messages);
         }
 
-        return Ok();
+        return Ok(result.Value);
     }
 }
