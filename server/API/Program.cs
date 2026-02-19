@@ -33,6 +33,8 @@ public class Program
 
 
         builder.Services.AddControllers();
+        builder.Services.AddAuthentication();
+        builder.Services.AddAuthorization();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
@@ -49,6 +51,7 @@ public class Program
         builder.Services.AddScoped<IUserService, UserService>();
 
         builder.Services.AddInfrastucture(builder.Configuration);
+        builder.Services.ConfigureJwt(builder.Configuration);
 
         builder.Services.AddTransient<IPasswordService, PasswordService>();
 
@@ -58,6 +61,8 @@ public class Program
         app.UseSerilogRequestLogging();
         app.UseCors("AllowAll");
         app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
 
         app.Lifetime.ApplicationStarted.Register(() =>
