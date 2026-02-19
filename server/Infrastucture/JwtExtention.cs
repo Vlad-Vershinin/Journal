@@ -21,6 +21,8 @@ public static class JwtExtention
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
+                ValidateIssuer = false,
+                ValidateAudience = false,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(

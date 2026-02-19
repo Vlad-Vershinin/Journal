@@ -33,7 +33,6 @@ public class Program
 
 
         builder.Services.AddControllers();
-        builder.Services.AddAuthentication();
         builder.Services.AddAuthorization();
 
         builder.Services.AddDbContext<AppDbContext>(options =>
