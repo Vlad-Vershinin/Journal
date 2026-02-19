@@ -22,9 +22,9 @@ public class JwtService : IJwtService
     {
         var claims = new List<Claim>
         {
-            new Claim("id", user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim("fullName", user.FullName),
-            new Claim("role", user.Role.ToString())
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
         var jwtToken = new JwtSecurityToken(
