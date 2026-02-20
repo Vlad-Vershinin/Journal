@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace Infrastucture;
+namespace Infrastucture.Extensions;
 
 public static class JwtExtention
 {

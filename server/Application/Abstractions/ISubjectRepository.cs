@@ -1,6 +1,6 @@
 using Domain.Models;
 
-namespace Domain.Repositories;
+namespace Application.Abstractions;
 
 public interface ISubjectRepository : IBaseRepository<Subject>
 {

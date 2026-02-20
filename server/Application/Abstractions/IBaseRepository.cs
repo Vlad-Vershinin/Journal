@@ -1,4 +1,4 @@
-namespace Domain.Repositories;
+namespace Application.Abstractions;
 
 public interface IBaseRepository<T> where T : class
 {

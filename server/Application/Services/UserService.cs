@@ -1,7 +1,6 @@
 ﻿using Application.Abstractions;
 using Domain.DTOs;
 using Domain.Models;
-using Domain.Repositories;
 using Domain.Services;
 using Microsoft.Extensions.Logging;
 
