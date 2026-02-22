@@ -1,4 +1,4 @@
-﻿namespace Domain.Services;
+﻿namespace Application.Abstractions;
 
 public interface IPasswordService
 {

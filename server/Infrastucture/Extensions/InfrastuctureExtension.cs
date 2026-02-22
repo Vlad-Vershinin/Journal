@@ -17,6 +17,8 @@ public static class InfrastuctureExtension
     {
         services.AddScoped<IJwtService, JwtService>();
 
+        services.AddTransient<IPasswordService, PasswordService>();
+
         services.AddOptions<JwtSettings>()
             .Bind(configuration.GetSection("Jwt"))
             .ValidateOnStart();

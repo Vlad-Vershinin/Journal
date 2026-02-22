@@ -42,8 +42,6 @@ public class Program
         builder.Services.AddRepositories(builder.Configuration);
         builder.Services.ConfigureJwt(builder.Configuration);
 
-        builder.Services.AddTransient<IPasswordService, PasswordService>();
-
 
         var app = builder.Build();
 
