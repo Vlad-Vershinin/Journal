@@ -1,5 +1,5 @@
-﻿using Application.Services;
-using Domain.DTOs;
+﻿using API.DTOs;
+using Application.Services;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +34,7 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        var result = await _userService.Login(dto);
+        var result = await _userService.Login(dto.Login, dto.Password);
 
         if (result.IsFailure)
         {

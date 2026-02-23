@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Domain.DTOs;
 using Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -52,19 +51,19 @@ public class UserService
         }
     }
 
-    public async Task<Result<string>> Login(LoginDto dto)
+    public async Task<Result<string>> Login(string login, string password)
     {
-        var user = await _repository.GetByLoginAsync(dto.Login);
+        var user = await _repository.GetByLoginAsync(login);
 
         if (user is null)
         {
-            _logger.LogWarning("Попытка входа: пользователь {Login} не найден", dto.Login);
+            _logger.LogWarning("Попытка входа: пользователь {Login} не найден", login);
             return Result<string>.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
         }
 
-        if (!_passwordService.ValidatePassword(dto.Password, user.PasswordHash))
+        if (!_passwordService.ValidatePassword(password, user.PasswordHash))
         {
-            _logger.LogWarning("Попытка входа: неверный пароль для {Login}", dto.Login);
+            _logger.LogWarning("Попытка входа: неверный пароль для {Login}", login);
             return Result<string>.Failure(ErrorCode.Unauthorized, "Неверный логин или пароль.");
         }
 

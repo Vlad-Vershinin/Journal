@@ -1,7 +1,6 @@
 using Application.Services;
 using DotNetEnv;
 using Infrastucture.Extensions;
-using Infrastucture.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Serilog;
