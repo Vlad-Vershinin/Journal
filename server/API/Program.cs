@@ -1,5 +1,4 @@
 using Application.Services;
-using Domain.Services;
 using DotNetEnv;
 using Infrastucture.Extensions;
 using Infrastucture.Services;
@@ -36,7 +35,7 @@ public class Program
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<UserService>();
 
         builder.Services.AddInfrastucture(builder.Configuration);
         builder.Services.AddRepositories(builder.Configuration);

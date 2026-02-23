@@ -1,6 +1,6 @@
-﻿using Domain.DTOs;
+﻿using Application.Services;
+using Domain.DTOs;
 using Domain.Models;
-using Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly UserService _userService;
 
-    public UserController(IUserService userService)
+    public UserController(UserService userService)
     {
         _userService = userService;
     }

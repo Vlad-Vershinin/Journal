@@ -1,12 +1,11 @@
 ﻿using Application.Abstractions;
 using Domain.DTOs;
 using Domain.Models;
-using Domain.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class UserService : IUserService
+public class UserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordService _passwordService;
