@@ -1,10 +1,6 @@
 using Application.Services;
-using Domain.Repositories;
-using Domain.Services;
 using DotNetEnv;
-using Infrastucture;
-using Infrastucture.Repositories;
-using Infrastucture.Services;
+using Infrastucture.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Serilog;
@@ -38,21 +34,11 @@ public class Program
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IGroupRepository, GroupRepository>();
-        builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
-        builder.Services.AddScoped<IGradeRepository, GradeRepository>();
-        builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
-        builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
-        builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
-
-        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<UserService>();
 
         builder.Services.AddInfrastucture(builder.Configuration);
+        builder.Services.AddRepositories(builder.Configuration);
         builder.Services.ConfigureJwt(builder.Configuration);
-
-        builder.Services.AddTransient<IPasswordService, PasswordService>();
 
 
         var app = builder.Build();

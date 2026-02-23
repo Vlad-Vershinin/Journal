@@ -1,4 +1,4 @@
-using Domain.Repositories;
+using Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 

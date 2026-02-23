@@ -1,5 +1,5 @@
+using Application.Abstractions;
 using Domain.Models;
-using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 

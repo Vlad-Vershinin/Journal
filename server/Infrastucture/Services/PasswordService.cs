@@ -1,4 +1,4 @@
-﻿using Domain.Services;
+﻿using Application.Abstractions;
 
 namespace Infrastucture.Services;
 
