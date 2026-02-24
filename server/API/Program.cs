@@ -37,6 +37,7 @@ public class Program
             options.UseNpgsql(connectionString));
 
         builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<AdminGroupService>();
 
         builder.Services.AddInfrastucture(builder.Configuration);
         builder.Services.AddRepositories(builder.Configuration);
