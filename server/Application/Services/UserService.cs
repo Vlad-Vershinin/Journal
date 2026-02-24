@@ -57,7 +57,18 @@ public class UserService
             return Result<User>.Failure(ErrorCode.NotCreated, "Ошибка при создании пользователя.");
         }
     }
-
+    public async Task<Result<string>> DeleteUser(int id)
+    {
+        var userDelete = await _repository.GetByIdAsync(id);
+        if (userDelete is null)
+        {
+            _logger.LogWarning("Попытка удаления: пользователь {Id} не найден", id);
+            return Result<string>.Failure(ErrorCode.Unauthorized, "Не удалось найти пользователя");
+        }
+        await _repository.DeleteAsync(id);
+        _logger.LogInformation("Пользователь {Id} успешно удалён.", userDelete.Id);
+        return Result<string>.Success("Пользователь удален");
+    }
     public async Task<Result<string>> Login(string login, string password)
     {
         var user = await _repository.GetByLoginAsync(login);
