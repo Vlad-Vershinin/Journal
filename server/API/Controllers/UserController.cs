@@ -30,7 +30,19 @@ public class UserController : ControllerBase
 
         return Ok(result.Value);
     }
+    [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var result = await _userService.DeleteUser(id);
 
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+
+        return Ok(result.Value);
+    }
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
