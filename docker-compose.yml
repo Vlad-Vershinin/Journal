@@ -1,4 +1,16 @@
 services:
+  postgres:
+      image: postgres:17
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: toor
+        POSTGRES_USER: postgres
+        POSTGRES_DB: journal
+      ports:
+        - "5433:5432"
+      volumes:
+        - postgres-data:/var/lib/postgresql/data
+  
   api:
     build:
       context: ./server
@@ -9,3 +21,6 @@ services:
       - DOTNET_ENVIRONMENT=Development
     env_file:
       - server/API/.env
+
+volumes:
+  postgres-data:

@@ -1,4 +1,6 @@
+using Application.Abstractions;
 using Application.Services;
+using Domain.Models;
 using DotNetEnv;
 using Infrastucture.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +51,33 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.Migrate();
+
+            if (!db.Users.Any(u => u.Role == UserRole.Admin))
+            {
+                var admin_fullane = Env.GetString("USER__DEFAULT_ADMIN_FULLNAME")
+                    ?? throw new InvalidOperationException("No admin password");
+                var admin_login = Env.GetString("USER__DEFAULT_ADMIN_LOGIN")
+                    ?? throw new InvalidOperationException("No admin login");
+                var admin_password = Env.GetString("USER__DEFAULT_ADMIN_PASSWORD")
+                    ?? throw new InvalidOperationException("No admin password");
+                var password_service = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+
+                db.Users.Add(new User
+                {
+                    FullName = admin_login,
+                    Login = admin_login,
+                    PasswordHash = password_service.HashPassword(admin_password),
+                    Role = UserRole.Admin
+                });
+
+                db.SaveChanges();
+            }
+        }
 
         app.Lifetime.ApplicationStarted.Register(() =>
         {
