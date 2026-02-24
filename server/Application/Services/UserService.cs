@@ -30,6 +30,13 @@ public class UserService
         try
         {
             user.PasswordHash = _passwordService.HashPassword(user.PasswordHash);
+            var users = await _repository.GetAllAsync();
+            if (users.Any(u => u.Login.Equals(user.Login, StringComparison.OrdinalIgnoreCase)))
+            {
+                _logger.LogError("Ошибка БД: Не полулось создать пользователя {Login}, такой логин уже используется.", user.Login);
+                return Result<User>.Failure(ErrorCode.NotCreated, "Не удалось создать пользователя.");
+            }
+
             await _repository.AddAsync(user);
             await _repository.SaveChangesAsync();
 
