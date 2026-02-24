@@ -30,4 +30,30 @@ public class AdminGroupController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteGroup([FromQuery] int id)
+    {
+        var result = await _groupService.DeleteGroup(id);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+
+        return Ok();
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> RenameGroup(int id, [FromBody] RenameGroupDto groupDto)
+    {
+        var result = await _groupService.RenameGroup(id, groupDto.Name);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+
+        return Ok();
+    }
 }
