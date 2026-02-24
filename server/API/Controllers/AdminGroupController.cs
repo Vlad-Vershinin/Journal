@@ -28,7 +28,13 @@ public class AdminGroupController : ControllerBase
             return BadRequest(result.Messages);
         }
 
-        return Ok(result.Value);
+        var response = new ResponseCreateGroup
+        {
+            Id = result.Value!.Id,
+            GroupName = result.Value!.Name,
+        };
+
+        return Ok(response);
     }
 
     [HttpDelete]
