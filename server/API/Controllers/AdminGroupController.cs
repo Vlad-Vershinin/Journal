@@ -37,6 +37,18 @@ public class AdminGroupController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetGroupWithUsers(int id)
+    {
+        var result = await _groupService.GetGroup(id);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        var group = result.Value!;
+        return Ok(group);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetGroupsNames()
     {

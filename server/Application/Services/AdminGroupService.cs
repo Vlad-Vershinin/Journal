@@ -49,6 +49,30 @@ public class AdminGroupService
         }
     }
 
+    public async Task<Result<Group>> GetGroup(int id)
+    {
+        _logger.LogInformation("Получения группы: {Id}", id);
+
+        try
+        {
+            var group = await _repository.GetWithUsersAsync(id);
+
+            if (group == null)
+            {
+                _logger.LogWarning("Группа с id {Id} не найдена", id);
+                return Result<Group>.Failure(ErrorCode.NotFound, "Группа не найдена");
+            }
+
+            _logger.LogInformation("Полученна группа с {Count} участниками", group.Users.Count);
+            return Result<Group>.Success(group);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошика при получении данных группы");
+            return Result<Group>.Failure(ErrorCode.NotFound, "Ошибка при получении данных группы");
+        }
+    }
+
     public async Task<Result<List<Group>>> GetGroupsName()
     {
         _logger.LogInformation("Получение списка групп");
