@@ -49,6 +49,24 @@ public class AdminGroupService
         }
     }
 
+    public async Task<Result<List<Group>>> GetGroupsName()
+    {
+        _logger.LogInformation("Получение списка групп");
+
+        try
+        {
+            var groups = await _repository.GetGroupsNameAsync();
+            _logger.LogInformation("Получено {Count} групп", groups.Count);
+
+            return Result<List<Group>>.Success(groups);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка групп");
+            return Result<List<Group>>.Failure(ErrorCode.NotFound, "Ошибка при получении списка групп.");
+        }
+    }
+
     public async Task<Result> DeleteGroup(int groupId)
     {
         _logger.LogInformation("Удаление группы: {GroupId}", groupId);

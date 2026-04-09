@@ -37,6 +37,22 @@ public class AdminGroupController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetGroupsNames()
+    {
+        var result = await _groupService.GetGroupsName();
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        var response = result.Value!.Select(g => new ResponseGetGroup
+        {
+            Id = g.Id,
+            GroupName = g.Name,
+        }).ToList();
+        return Ok(response);
+    }
+
     [HttpDelete]
     public async Task<IActionResult> DeleteGroup([FromQuery] int id)
     {
