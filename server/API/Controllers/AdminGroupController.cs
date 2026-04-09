@@ -90,4 +90,15 @@ public class AdminGroupController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPatch("{groupId}/{userId}")]
+    public async Task<IActionResult> AddUserToGroup(int groupId, int userId)
+    {
+        var result = await _groupService.AddUserToGroup(groupId, userId);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        return Ok();
+    }
 }

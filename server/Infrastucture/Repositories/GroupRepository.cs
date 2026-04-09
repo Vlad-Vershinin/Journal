@@ -30,5 +30,4 @@ public class GroupRepository : BaseRepository<Group>, IGroupRepository
     {
         return await _dbSet.Include(g => g.Users).FirstOrDefaultAsync(g => g.Id == id);
     }
-
 }

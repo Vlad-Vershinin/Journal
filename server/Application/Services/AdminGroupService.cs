@@ -7,14 +7,17 @@ namespace Application.Services;
 public class AdminGroupService
 {
     private readonly IGroupRepository _repository;
+    private readonly IUserRepository _userRepository;
     private readonly ILogger<AdminGroupService> _logger;
 
     public AdminGroupService(
         IGroupRepository gradeRepository,
-        ILogger<AdminGroupService> logger)
+        ILogger<AdminGroupService> logger,
+        IUserRepository userRepository)
     {
         _repository = gradeRepository;
         _logger = logger;
+        _userRepository = userRepository;
     }
 
     public async Task<Result<Group>> CreateGroup(string groupName)
@@ -152,6 +155,41 @@ public class AdminGroupService
         {
             _logger.LogError(ex, "Ошибка при переименовании группы {GroupId}", groupId);
             return Result<Group>.Failure(ErrorCode.NotCreated, "Ошибка при переименовании группы.");
+        }
+    }
+
+    public async Task<Result> AddUserToGroup(int groupId, int userId)
+    {
+        _logger.LogInformation("Добавление пользователя {UserId} в группу {GroupId}", userId, groupId);
+        try
+        {
+            var group = await _repository.GetWithUsersAsync(groupId);
+
+            if (group == null)
+            {
+                return Result.Failure(ErrorCode.NotFound, "Группа не найдена.");
+            }
+
+            if (group.Users.Any(u => u.Id == userId))
+            {
+                return Result.Failure(ErrorCode.Conflict, "Пользователь уже в группе.");
+            }
+
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return Result.Failure(ErrorCode.NotFound, "Пользователь не найден.");
+            }
+
+            group.Users.Add(user);
+
+            await _repository.SaveChangesAsync();
+            return Result<Group>.Success(group);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при добавлении пользователя {UserId} в группу {GroupId}", userId, groupId);
+            return Result.Failure(ErrorCode.NotCreated, "Ошибка при добавлении пользователя в группу.");
         }
     }
 }
