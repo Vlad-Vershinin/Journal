@@ -101,4 +101,15 @@ public class AdminGroupController : ControllerBase
         }
         return Ok();
     }
+
+    [HttpPatch("{groupId}/remove/{userId}")]
+    public async Task<IActionResult> RemoveUserFromGroup(int groupId, int userId)
+    {
+        var result = await _groupService.RemoveUserFromGroup(groupId, userId);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        return Ok();
+    }
 }

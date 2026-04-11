@@ -192,4 +192,34 @@ public class AdminGroupService
             return Result.Failure(ErrorCode.NotCreated, "Ошибка при добавлении пользователя в группу.");
         }
     }
+
+    public async Task<Result<Group>> RemoveUserFromGroup(int groupId, int userId)
+    {
+        _logger.LogInformation("Удаление пользователя {UserId} из группы {GroupId}", userId, groupId);
+        try
+        {
+            var group = await _repository.GetWithUsersAsync(groupId);
+
+            if (group == null)
+            {
+                return Result<Group>.Failure(ErrorCode.NotFound, "Группа не найдена.");
+            }
+
+            var user = group.Users.FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return Result<Group>.Failure(ErrorCode.NotFound, "Пользователь не найден в группе.");
+            }
+
+            group.Users.Remove(user);
+            await _repository.SaveChangesAsync();
+            return Result<Group>.Success(group);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении пользователя {UserId} из группы {GroupId}", userId, groupId);
+            return Result<Group>.Failure(ErrorCode.NotCreated, "Ошибка при удалении пользователя из группы.");
+        }
+    }
 }

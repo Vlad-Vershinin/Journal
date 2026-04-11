@@ -30,6 +30,7 @@ public class UserController : ControllerBase
 
         return Ok(result.Value);
     }
+
     [HttpDelete("{id}")]
     [Authorize(Roles = nameof(UserRole.Admin))]
     public async Task<IActionResult> DeleteUser(int id)
@@ -43,6 +44,7 @@ public class UserController : ControllerBase
 
         return Ok(result.Value);
     }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
