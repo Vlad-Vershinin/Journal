@@ -7,14 +7,17 @@ namespace Application.Services;
 public class AdminGroupService
 {
     private readonly IGroupRepository _repository;
+    private readonly IUserRepository _userRepository;
     private readonly ILogger<AdminGroupService> _logger;
 
     public AdminGroupService(
         IGroupRepository gradeRepository,
-        ILogger<AdminGroupService> logger)
+        ILogger<AdminGroupService> logger,
+        IUserRepository userRepository)
     {
         _repository = gradeRepository;
         _logger = logger;
+        _userRepository = userRepository;
     }
 
     public async Task<Result<Group>> CreateGroup(string groupName)
@@ -46,6 +49,48 @@ public class AdminGroupService
         {
             _logger.LogError(ex, "Ошибка при создании группы {GroupName}", groupName);
             return Result<Group>.Failure(ErrorCode.NotCreated, "Ошибка при создании группы.");
+        }
+    }
+
+    public async Task<Result<Group>> GetGroup(int id)
+    {
+        _logger.LogInformation("Получения группы: {Id}", id);
+
+        try
+        {
+            var group = await _repository.GetWithUsersAsync(id);
+
+            if (group == null)
+            {
+                _logger.LogWarning("Группа с id {Id} не найдена", id);
+                return Result<Group>.Failure(ErrorCode.NotFound, "Группа не найдена");
+            }
+
+            _logger.LogInformation("Полученна группа с {Count} участниками", group.Users.Count);
+            return Result<Group>.Success(group);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошика при получении данных группы");
+            return Result<Group>.Failure(ErrorCode.NotFound, "Ошибка при получении данных группы");
+        }
+    }
+
+    public async Task<Result<List<Group>>> GetGroupsName()
+    {
+        _logger.LogInformation("Получение списка групп");
+
+        try
+        {
+            var groups = await _repository.GetGroupsNameAsync();
+            _logger.LogInformation("Получено {Count} групп", groups.Count);
+
+            return Result<List<Group>>.Success(groups);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка групп");
+            return Result<List<Group>>.Failure(ErrorCode.NotFound, "Ошибка при получении списка групп.");
         }
     }
 
@@ -110,6 +155,71 @@ public class AdminGroupService
         {
             _logger.LogError(ex, "Ошибка при переименовании группы {GroupId}", groupId);
             return Result<Group>.Failure(ErrorCode.NotCreated, "Ошибка при переименовании группы.");
+        }
+    }
+
+    public async Task<Result> AddUserToGroup(int groupId, int userId)
+    {
+        _logger.LogInformation("Добавление пользователя {UserId} в группу {GroupId}", userId, groupId);
+        try
+        {
+            var group = await _repository.GetWithUsersAsync(groupId);
+
+            if (group == null)
+            {
+                return Result.Failure(ErrorCode.NotFound, "Группа не найдена.");
+            }
+
+            if (group.Users.Any(u => u.Id == userId))
+            {
+                return Result.Failure(ErrorCode.Conflict, "Пользователь уже в группе.");
+            }
+
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return Result.Failure(ErrorCode.NotFound, "Пользователь не найден.");
+            }
+
+            group.Users.Add(user);
+
+            await _repository.SaveChangesAsync();
+            return Result<Group>.Success(group);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при добавлении пользователя {UserId} в группу {GroupId}", userId, groupId);
+            return Result.Failure(ErrorCode.NotCreated, "Ошибка при добавлении пользователя в группу.");
+        }
+    }
+
+    public async Task<Result<Group>> RemoveUserFromGroup(int groupId, int userId)
+    {
+        _logger.LogInformation("Удаление пользователя {UserId} из группы {GroupId}", userId, groupId);
+        try
+        {
+            var group = await _repository.GetWithUsersAsync(groupId);
+
+            if (group == null)
+            {
+                return Result<Group>.Failure(ErrorCode.NotFound, "Группа не найдена.");
+            }
+
+            var user = group.Users.FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return Result<Group>.Failure(ErrorCode.NotFound, "Пользователь не найден в группе.");
+            }
+
+            group.Users.Remove(user);
+            await _repository.SaveChangesAsync();
+            return Result<Group>.Success(group);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении пользователя {UserId} из группы {GroupId}", userId, groupId);
+            return Result<Group>.Failure(ErrorCode.NotCreated, "Ошибка при удалении пользователя из группы.");
         }
     }
 }

@@ -18,6 +18,14 @@ public class GroupRepository : BaseRepository<Group>, IGroupRepository
             .ToListAsync();
     }
 
+    public async Task<List<Group>> GetGroupsNameAsync()
+    {
+        return await _dbSet
+            .Select(g => new Group { Id = g.Id, Name = g.Name })
+            .ToListAsync();
+    }
+
+
     public async Task<Group?> GetWithUsersAsync(int id)
     {
         return await _dbSet.Include(g => g.Users).FirstOrDefaultAsync(g => g.Id == id);

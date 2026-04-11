@@ -37,6 +37,34 @@ public class AdminGroupController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetGroupWithUsers(int id)
+    {
+        var result = await _groupService.GetGroup(id);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        var group = result.Value!;
+        return Ok(group);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetGroupsNames()
+    {
+        var result = await _groupService.GetGroupsName();
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        var response = result.Value!.Select(g => new ResponseGetGroup
+        {
+            Id = g.Id,
+            GroupName = g.Name,
+        }).ToList();
+        return Ok(response);
+    }
+
     [HttpDelete]
     public async Task<IActionResult> DeleteGroup([FromQuery] int id)
     {
@@ -60,6 +88,28 @@ public class AdminGroupController : ControllerBase
             return BadRequest(result.Messages);
         }
 
+        return Ok();
+    }
+
+    [HttpPatch("{groupId}/{userId}")]
+    public async Task<IActionResult> AddUserToGroup(int groupId, int userId)
+    {
+        var result = await _groupService.AddUserToGroup(groupId, userId);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        return Ok();
+    }
+
+    [HttpPatch("{groupId}/remove/{userId}")]
+    public async Task<IActionResult> RemoveUserFromGroup(int groupId, int userId)
+    {
+        var result = await _groupService.RemoveUserFromGroup(groupId, userId);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
         return Ok();
     }
 }

@@ -38,7 +38,6 @@ public class UserService
             }
 
             await _repository.AddAsync(user);
-            await _repository.SaveChangesAsync();
 
             var new_user = await _repository.GetByLoginAsync(user.Login);
 
