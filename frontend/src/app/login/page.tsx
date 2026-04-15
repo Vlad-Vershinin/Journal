@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
+import * as jose from "jose";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("http://localhost:5280/api/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ login, password }),
@@ -30,11 +31,19 @@ export default function LoginPage() {
         throw new Error("Неверный логин или пароль");
       }
 
-      const data = await res.json();
+      const token = await res.text().then(t => t.replace(/^"|"$/g, ''));
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", token);
 
-      router.push("/");
+      const payload = jose.decodeJwt(token);
+
+      const role = payload?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      if (role === "Admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -47,6 +56,7 @@ export default function LoginPage() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
+
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-card dark:shadow-none dark:border dark:border-border-dark p-10">
           <div className="text-center mb-8">
@@ -111,6 +121,10 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
+
+        <p className="text-center text-sm text-text-muted dark:text-text-dark-muted mt-6">
+          Аккаунты создаёт администратор
+        </p>
       </div>
     </div>
   );

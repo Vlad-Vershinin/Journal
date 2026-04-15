@@ -15,4 +15,14 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
         return await _dbSet.FirstOrDefaultAsync(u => u.Login == login);
     }
+
+    public async Task<List<User>> GetWithPagination(int pageNumber, int pageSize, UserRole userRole)
+    {
+        return await _dbSet
+            .Where(x => x.Role == userRole)
+            .OrderBy(x => x.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }

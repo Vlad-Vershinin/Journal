@@ -1,4 +1,5 @@
 using Application.Abstractions;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -18,6 +19,11 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     public async Task<T?> GetByIdAsync(int id)
     {
         return await _dbSet.FindAsync(id);
+    }
+
+    public async Task<List<T>> GetWithPagination(int pageNumber, int pageSize)
+    {
+        return await _dbSet.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
     public async Task<List<T>> GetAllAsync()

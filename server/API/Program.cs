@@ -20,6 +20,17 @@ public class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("allowFrontend",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
 
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
@@ -47,7 +58,7 @@ public class Program
         var app = builder.Build();
 
         app.UseSerilogRequestLogging();
-        app.UseCors("AllowAll");
+        app.UseCors("allowFrontend");
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();

@@ -57,4 +57,16 @@ public class UserController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpGet]
+    [Authorize(Roles = nameof(UserRole.Admin))]
+    public IActionResult GetUsers(int page, int pageSize)
+    {
+        var result = _userService.GetUsers(page, pageSize);
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Messages);
+        }
+        return Ok(result.Value);
+    }
 }
